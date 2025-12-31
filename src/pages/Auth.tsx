@@ -51,12 +51,21 @@ export default function Auth() {
     setIsLoading(false);
 
     if (error) {
+      let message = error.message;
+      let title = 'Erro ao entrar';
+      
+      if (error.message === 'Invalid login credentials') {
+        message = 'Email ou senha incorretos';
+      } else if (error.message.includes('Email not confirmed')) {
+        title = '📧 Email não confirmado';
+        message = 'Por favor, verifique sua caixa de entrada e clique no link de confirmação enviado para seu email.';
+      }
+      
       toast({
         variant: 'destructive',
-        title: 'Erro ao entrar',
-        description: error.message === 'Invalid login credentials' 
-          ? 'Email ou senha incorretos' 
-          : error.message,
+        title,
+        description: message,
+        duration: 8000,
       });
       return;
     }
@@ -83,11 +92,13 @@ export default function Auth() {
     }
 
     toast({
-      title: 'Conta criada com sucesso!',
-      description: 'Você já pode fazer login.',
+      title: '✅ Conta criada com sucesso!',
+      description: '📧 Verifique seu email e clique no link de confirmação para ativar sua conta.',
+      duration: 8000, // Mensagem fica visível por 8 segundos
     });
     
-    navigate('/dashboard');
+    // Não redireciona, mantém na página de login
+    setIsLogin(true);
   };
 
   return (

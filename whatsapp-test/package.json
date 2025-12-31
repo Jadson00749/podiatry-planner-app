@@ -1,0 +1,15 @@
+{
+  "name": "podoagenda-whatsapp",
+  "version": "1.0.0",
+  "description": "WhatsApp integration for PodoAgenda",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.89.0",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.23.0"
+  }
+}
+

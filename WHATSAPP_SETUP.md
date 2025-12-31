@@ -397,3 +397,4 @@ function generateReminderMessage(data: AppointmentData): string {
 
 **Desenvolvido por Jadson Santos © 2024**
 
+

@@ -117,9 +117,9 @@ export function NewAppointmentForm({ defaultDate, onSuccess }: NewAppointmentFor
     }
   };
 
-  // Generate time slots
+  // Generate time slots (7:00 até 23:30)
   const timeSlots = [];
-  for (let hour = 7; hour <= 20; hour++) {
+  for (let hour = 7; hour <= 23; hour++) {
     timeSlots.push(`${hour.toString().padStart(2, '0')}:00`);
     timeSlots.push(`${hour.toString().padStart(2, '0')}:30`);
   }

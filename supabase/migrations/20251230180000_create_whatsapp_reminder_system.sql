@@ -102,8 +102,13 @@ END;
 $$;
 
 -- Cria o job do cron para executar a cada 30 minutos
--- Remove job anterior se existir
-SELECT cron.unschedule('send-whatsapp-reminders') WHERE true;
+-- Remove job anterior se existir (ignora erro se não existir)
+DO $$
+BEGIN
+  PERFORM cron.unschedule('send-whatsapp-reminders');
+EXCEPTION
+  WHEN OTHERS THEN NULL;
+END $$;
 
 -- Cria novo job
 SELECT cron.schedule(
@@ -132,7 +137,8 @@ CREATE TABLE IF NOT EXISTS public.reminder_logs (
 -- Habilita RLS na tabela de logs
 ALTER TABLE public.reminder_logs ENABLE ROW LEVEL SECURITY;
 
--- Policy para logs
+-- Policy para logs (remove antiga se existir)
+DROP POLICY IF EXISTS "Users can view their own reminder logs" ON public.reminder_logs;
 CREATE POLICY "Users can view their own reminder logs" ON public.reminder_logs
   FOR SELECT USING (
     appointment_id IN (
