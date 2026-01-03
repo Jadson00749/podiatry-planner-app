@@ -37,6 +37,7 @@ export default function ClienteDetalhes() {
   const { toast } = useToast();
   
   const client = clients?.find(c => c.id === id);
+  const [activeTab, setActiveTab] = useState('dados');
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: client?.name || '',
@@ -240,7 +241,36 @@ export default function ClienteDetalhes() {
   };
 
   const handleEditAnamnesis = () => {
+    if (anamnesis) {
+      setAnamnesisData({
+        main_complaint: anamnesis.main_complaint || '',
+        problem_history: anamnesis.problem_history || '',
+        has_diabetes: anamnesis.has_diabetes || false,
+        has_circulatory_problems: anamnesis.has_circulatory_problems || false,
+        has_hypertension: anamnesis.has_hypertension || false,
+        uses_continuous_medication: anamnesis.uses_continuous_medication || false,
+        has_allergies: anamnesis.has_allergies || false,
+        is_pregnant: anamnesis.is_pregnant || false,
+        skin_type: anamnesis.skin_type || '',
+        sensitivity: anamnesis.sensitivity || '',
+        nail_condition: anamnesis.nail_condition || '',
+        calluses_fissures: anamnesis.calluses_fissures || '',
+        clinical_observations: anamnesis.clinical_observations || '',
+      });
+    }
     setIsEditingAnamnesis(true);
+  };
+
+  const handleNavigateToAnamneseEdit = () => {
+    setActiveTab('anamnese');
+    // Usar setTimeout para garantir que a aba mude antes de habilitar edição
+    setTimeout(() => {
+      if (hasAnamnesis) {
+        handleEditAnamnesis();
+      } else {
+        handleCreateAnamnesis();
+      }
+    }, 100);
   };
 
   const handleCancelAnamnesis = () => {
@@ -343,7 +373,7 @@ export default function ClienteDetalhes() {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="dados" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="dados">Dados</TabsTrigger>
             <TabsTrigger value="anamnese">Anamnese</TabsTrigger>
@@ -562,26 +592,24 @@ export default function ClienteDetalhes() {
                     </>
                   )}
                 </div>
-                {!isEditingAnamnesis && (
-                  <Button 
-                    variant={hasAnamnesis ? "outline" : "default"}
-                    size="sm"
-                    onClick={hasAnamnesis ? handleEditAnamnesis : handleCreateAnamnesis}
-                    className={hasAnamnesis ? "" : "gradient-primary"}
-                  >
-                    {hasAnamnesis ? (
-                      <>
-                        <Edit2 className="h-4 w-4 mr-2" />
-                        Editar anamnese
-                      </>
-                    ) : (
-                      <>
-                        <Edit2 className="h-4 w-4 mr-2" />
-                        Criar anamnese
-                      </>
-                    )}
-                  </Button>
-                )}
+                <Button 
+                  variant={hasAnamnesis ? "outline" : "default"}
+                  size="sm"
+                  onClick={handleNavigateToAnamneseEdit}
+                  className={hasAnamnesis ? "" : "gradient-primary"}
+                >
+                  {hasAnamnesis ? (
+                    <>
+                      <Edit2 className="h-4 w-4 mr-2" />
+                      Editar anamnese
+                    </>
+                  ) : (
+                    <>
+                      <Edit2 className="h-4 w-4 mr-2" />
+                      Criar anamnese
+                    </>
+                  )}
+                </Button>
               </div>
             </div>
           </TabsContent>
