@@ -75,7 +75,7 @@ export function MiniCalendar({ selectedDate, onDateSelect, appointmentDates = []
                 'aspect-square flex flex-col items-center justify-center rounded-lg text-sm transition-colors relative',
                 isSelected && 'bg-primary text-primary-foreground',
                 isToday && !isSelected && 'border-2 border-primary',
-                holiday && !isSelected && 'text-destructive font-medium',
+                holiday && !isSelected && 'text-destructive font-medium border border-red-500 rounded-md',
                 !isSelected && !holiday && 'hover:bg-accent text-foreground'
               )}
             >

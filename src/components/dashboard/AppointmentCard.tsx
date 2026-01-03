@@ -77,7 +77,7 @@ export function AppointmentCard({
   }
 
   return (
-    <div className="p-4 rounded-xl bg-card border border-border hover:shadow-lg transition-all duration-300">
+    <div className="p-4 rounded-xl bg-card border border-border hover:shadow-lg transition-all duration-300 h-full flex flex-col w-full">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -115,7 +115,7 @@ export function AppointmentCard({
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 mt-auto">
         {appointment.status === 'scheduled' && onStatusChange && (
           <>
             <Button

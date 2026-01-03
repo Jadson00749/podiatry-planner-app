@@ -101,3 +101,10 @@ COMMENT ON FUNCTION public.send_appointment_reminders() IS
 'Função que busca agendamentos do dia e envia lembretes via WhatsApp entre 30min e 1h30min antes';
 
 
+
+
+
+
+
+
+

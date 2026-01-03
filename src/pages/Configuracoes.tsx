@@ -15,7 +15,11 @@ export default function Configuracoes() {
 
   useEffect(() => {
     if (profile) {
-      setFormData({ full_name: profile.full_name || '', clinic_name: profile.clinic_name || '', phone: profile.phone || '' });
+      setFormData({ 
+        full_name: profile.full_name || '', 
+        clinic_name: profile.clinic_name || '', 
+        phone: profile.phone || '' 
+      });
     }
   }, [profile]);
 
@@ -40,9 +44,27 @@ export default function Configuracoes() {
         <div className="rounded-xl bg-card border border-border p-6">
           <h2 className="text-lg font-semibold text-foreground mb-4">Perfil</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div><Label>Nome completo</Label><Input value={formData.full_name} onChange={e => setFormData({...formData, full_name: e.target.value})} /></div>
-            <div><Label>Nome da clínica</Label><Input value={formData.clinic_name} onChange={e => setFormData({...formData, clinic_name: e.target.value})} /></div>
-            <div><Label>Telefone</Label><Input value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} /></div>
+            <div>
+              <Label>Nome completo</Label>
+              <Input 
+                value={formData.full_name} 
+                onChange={e => setFormData({...formData, full_name: e.target.value})} 
+              />
+            </div>
+            <div>
+              <Label>Nome da clínica</Label>
+              <Input 
+                value={formData.clinic_name} 
+                onChange={e => setFormData({...formData, clinic_name: e.target.value})} 
+              />
+            </div>
+            <div>
+              <Label>Telefone</Label>
+              <Input 
+                value={formData.phone} 
+                onChange={e => setFormData({...formData, phone: e.target.value})} 
+              />
+            </div>
             <Button type="submit" className="gradient-primary">Salvar alterações</Button>
           </form>
         </div>

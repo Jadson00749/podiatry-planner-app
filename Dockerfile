@@ -1,1 +1,0 @@
-FROM mgpastorini/pastorini-api:1.4.3

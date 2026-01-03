@@ -1,15 +1,18 @@
+import { useState } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Calendar, Users, DollarSign, Clock, TrendingUp, AlertCircle } from 'lucide-react';
+import { Calendar as CalendarIcon, Users, DollarSign, Clock, TrendingUp, AlertCircle } from 'lucide-react';
 import { AppLayout } from '@/components/AppLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
-import { MiniCalendar } from '@/components/dashboard/MiniCalendar';
+import { Calendar } from '@/components/ui/calendar';
 import { AppointmentCard } from '@/components/dashboard/AppointmentCard';
 import { useProfile } from '@/hooks/useProfile';
 import { useAppointments, useTodayStats, useMonthStats, useUpdateAppointment } from '@/hooks/useAppointments';
 import { useClients } from '@/hooks/useClients';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
+import { getHolidaysForMonth } from '@/lib/holidays';
+import { isHolidayDate, disablePastDates } from '@/lib/calendar';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -22,6 +25,30 @@ export default function Dashboard() {
   const updateAppointment = useUpdateAppointment();
 
   const appointmentDates = todayAppointments?.map(a => a.appointment_date) || [];
+  
+  // Calendar states
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+
+  // Calcular número de colunas baseado na quantidade de appointments
+  const getGridCols = () => {
+    const count = todayAppointments?.length || 0;
+    if (count === 0) return 'grid-cols-1';
+    if (count === 1) return 'grid-cols-1';
+    if (count === 2) return 'md:grid-cols-2';
+    return 'md:grid-cols-2 xl:grid-cols-3';
+  };
+
+
+  // Obter feriados do mês atual
+  const holidays = getHolidaysForMonth(currentMonth.getFullYear(), currentMonth.getMonth());
+
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      setSelectedDate(date);
+      navigate(`/agenda?date=${format(date, 'yyyy-MM-dd')}`);
+    }
+  };
 
   const handleStatusChange = (id: string, status: 'completed' | 'cancelled' | 'scheduled' | 'no_show') => {
     updateAppointment.mutate({ id, status });
@@ -70,7 +97,7 @@ export default function Dashboard() {
           <StatCard
             title="Consultas Hoje"
             value={todayStats?.total || 0}
-            icon={<Calendar className="h-5 w-5" />}
+            icon={<CalendarIcon className="h-5 w-5" />}
             description={`${todayStats?.completed || 0} concluídas`}
             variant="primary"
           />
@@ -119,9 +146,9 @@ export default function Dashboard() {
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="flex flex-col sm:flex-row gap-4 lg:gap-6 w-full">
           {/* Today's Appointments */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="flex-1 space-y-4 min-w-0">
             <h2 className="text-lg font-semibold text-foreground">Consultas de Hoje</h2>
             
             {appointmentsLoading ? (
@@ -130,7 +157,7 @@ export default function Dashboard() {
               </div>
             ) : todayAppointments?.length === 0 ? (
               <div className="p-8 rounded-xl bg-card border border-border text-center">
-                <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                <CalendarIcon className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
                 <h3 className="font-medium text-foreground mb-1">Nenhuma consulta hoje</h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   Aproveite para organizar sua agenda!
@@ -143,27 +170,56 @@ export default function Dashboard() {
                 </button>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className={`grid grid-cols-1 ${getGridCols()} gap-4 auto-rows-fr`}>
                 {todayAppointments?.map((appointment) => (
-                  <AppointmentCard
-                    key={appointment.id}
-                    appointment={appointment}
-                    onStatusChange={handleStatusChange}
-                    onPaymentChange={handlePaymentChange}
-                  />
+                  <div key={appointment.id} className="min-w-0 h-full flex">
+                    <AppointmentCard
+                      appointment={appointment}
+                      onStatusChange={handleStatusChange}
+                      onPaymentChange={handlePaymentChange}
+                    />
+                  </div>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Mini Calendar */}
-          <div>
+          {/* Calendar */}
+          <div className="flex flex-col w-full sm:w-fit flex-shrink-0 sm:ml-auto">
             <h2 className="text-lg font-semibold text-foreground mb-4">Calendário</h2>
-            <MiniCalendar
-              selectedDate={new Date()}
-              onDateSelect={(date) => navigate(`/agenda?date=${format(date, 'yyyy-MM-dd')}`)}
-              appointmentDates={appointmentDates}
-            />
+            <div className="p-4 rounded-xl bg-card border border-border w-fit">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={handleDateSelect}
+                locale={ptBR}
+                disabled={disablePastDates}
+                modifiers={{
+                  holiday: isHolidayDate,
+                }}
+                modifiersClassNames={{
+                  holiday: 'border border-red-500 rounded-md',
+                }}
+                onMonthChange={setCurrentMonth}
+              />
+              
+              {/* Feriados do mês */}
+              {holidays.length > 0 && (
+                <div className="mt-4 pt-3 border-t border-border">
+                  <p className="text-xs font-medium text-muted-foreground mb-2">Feriados do mês:</p>
+                  <div className="space-y-1">
+                    {holidays.map((h) => (
+                      <div key={h.date} className="flex items-center gap-2 text-xs">
+                        <span className="text-destructive font-medium">
+                          {format(new Date(h.date + 'T00:00:00'), 'd')}
+                        </span>
+                        <span className="text-muted-foreground">{h.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
